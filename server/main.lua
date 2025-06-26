@@ -38,15 +38,28 @@ local function giveStarterItems()
     end
 end
 
+-- BL ID Card Support: (https://github.com/Byte-Labs-Studio/bl_idcard)
+-- local function giveStarterItems()
+--     local Player = QBCore.Functions.GetPlayer(source)
+--     if not Player then return end
+--     for _, v in pairs(QBCore.Shared.StarterItems) do
+--         if v.item == "id_card" or v.item == "driver_license" then
+--             exports.bl_idcard:createLicense(source, v.item)
+--         else
+--             Player.Functions.AddItem(v.item, v.amount)
+--         end
+--     end
+-- end
+
 -- Callbacks
 
-QBCore.Functions.CreateCallback('qb-cityhall:server:receiveJobs', function(_, cb)
-    cb(availableJobs)
+lib.callback.register('qb-cityhall:server:receiveJobs', function()
+    return availableJobs
 end)
 
-QBCore.Functions.CreateCallback('qb-cityhall:server:getIdentityData', function(source, cb, hallId)
+lib.callback.register('qb-cityhall:server:getIdentityData', function(source, hallId)
     local Player = QBCore.Functions.GetPlayer(source)
-    if not Player then return cb({}) end
+    if not Player then return {} end
 
     local licensesMeta = Player.PlayerData.metadata['licences']
     local availableLicenses = {}
@@ -57,7 +70,7 @@ QBCore.Functions.CreateCallback('qb-cityhall:server:getIdentityData', function(s
         end
     end
 
-    cb(availableLicenses)
+    return availableLicenses
 end)
 
 -- Events
@@ -91,6 +104,16 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     if not exports['qb-inventory']:AddItem(source, item, 1, false, info, 'qb-cityhall:server:requestId') then return end
     TriggerClientEvent('qb-inventory:client:ItemBox', src, QBCore.Shared.Items[item], 'add')
 end)
+
+-- BL ID Card Support: (https://github.com/Byte-Labs-Studio/bl_idcard)
+-- RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
+--     local src = source
+--     local Player = QBCore.Functions.GetPlayer(src)
+--     if not Player then return end
+--     local itemInfo = Config.Cityhalls[hall].licenses[item]
+--     if not Player.Functions.RemoveMoney('cash', itemInfo.cost, 'cityhall id') then return TriggerClientEvent('QBCore:Notify', src, ('You don\'t have enough money on you, you need %s cash'):format(itemInfo.cost), 'error') end
+--     exports.bl_idcard:createLicense(src, item)
+-- end)
 
 RegisterNetEvent('qb-cityhall:server:sendDriverTest', function(instructors)
     local src = source

@@ -14,14 +14,14 @@ Config.AvailableJobs = {                                     -- Only used when n
 
 Config.Cityhalls = {
     { -- Cityhall 1
-        coords = vec3(-265.0, -963.6, 31.2),
+        coords = vector3(-545.0, -204.4, 38.22),
         showBlip = true,
         blipData = {
-            sprite = 487,
+            sprite = 419,
             display = 4,
-            scale = 0.65,
+            scale = 0.9,
             colour = 0,
-            title = 'City Services'
+            title = 'City Hall'
         },
         licenses = {
             ['id_card'] = {
@@ -62,10 +62,10 @@ Config.DrivingSchools = {
 }
 
 Config.Peds = {
-    -- Cityhall Ped
+    -- City Hall Ped
     {
-        model = 'a_m_m_hasjew_01',
-        coords = vec4(-262.79, -964.18, 30.22, 181.71),
+        model = 'a_f_y_business_01',
+        coords = vector4(-545.0, -204.4, 37.22, 214.92),
         scenario = 'WORLD_HUMAN_STAND_MOBILE',
         cityhall = true,
         zoneOptions = { -- Used for when UseTarget is false
@@ -74,6 +74,7 @@ Config.Peds = {
             debugPoly = false
         }
     },
+
     -- Driving School Ped
     {
         model = 'a_m_m_eastsa_02',

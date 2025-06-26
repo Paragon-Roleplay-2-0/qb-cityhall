@@ -41,7 +41,8 @@ local function getClosestSchool()
 end
 
 local function createBlip(options)
-    if not options.coords or type(options.coords) ~= 'table' and type(options.coords) ~= 'vector3' then return error(('createBlip() expected coords in a vector3 or table but received %s'):format(options.coords)) end
+    if not options.coords or type(options.coords) ~= 'table' and type(options.coords) ~= 'vector3' then return error(('createBlip() expected coords in a vector3 or table but received %s')
+        :format(options.coords)) end
     local blip = AddBlipForCoord(options.coords.x, options.coords.y, options.coords.z)
     SetBlipSprite(blip, options.sprite or 1)
     SetBlipDisplay(blip, options.display or 4)
@@ -97,99 +98,83 @@ local function initBlips()
 end
 
 local function openCityhallMenu()
-    local mainMenu = {
-        {
-            header = 'City Hall',
-            isMenuHeader = true
-        },
-        {
-            header = 'ID Card',
-            txt = 'Get your ID Card',
-            params = {
-                event = 'qb-cityhall:client:openIdentityMenu'
-            }
-        },
-        {
-            header = 'Job Center',
-            txt = 'Available Jobs',
-            params = {
+    lib.registerContext({
+        id = 'cityhall_menu',
+        title = 'City Hall',
+        canClose = true,
+        options = {
+            {
+                title = 'ID Card',
+                description = 'Get your ID Card',
+                icon = 'fa-solid fa-id-card',
+                iconColor = 'white',
+                arrow = true,
+                event = 'qb-cityhall:client:openIdentityMenu',
+            },
+            {
+                title = 'Job Center',
+                description = 'Available Jobs',
+                icon = 'fa-solid fa-clipboard-list',
+                iconColor = 'white',
+                arrow = true,
                 event = 'qb-cityhall:client:openJobMenu'
             }
-        },
-        {
-            header = 'Close Menu',
-            txt = '',
-            params = {
-                event = 'qb-menu:client:closeMenu'
-            }
         }
-    }
+    })
 
-    exports['qb-menu']:openMenu(mainMenu)
+    lib.showContext('cityhall_menu')
 end
 
 local function openIdentityMenu()
-    QBCore.Functions.TriggerCallback('qb-cityhall:server:getIdentityData', function(licenses)
-        local identityMenu = {
-            {
-                header = 'Identity',
-                isMenuHeader = true
-            },
-            {
-                header = '← Go Back',
-                params = {
-                    event = 'qb-cityhall:client:openCityhallMenu'
+    lib.callback('qb-cityhall:server:getIdentityData', false, function(licenses)
+        local menuOptions = {}
+        for license, data in pairs(licenses) do
+            menuOptions[#menuOptions + 1] = {
+                title = data.label,
+                icon = 'fa-solid fa-address-card',
+                iconColor = 'white',
+                description = "Cost: $" .. data.cost,
+                event = 'qb-cityhall:client:requestId',
+                args = {
+                    type = license,
+                    cost = data.cost
                 }
             }
-        }
-
-        for license, data in pairs(licenses) do
-            table.insert(identityMenu, {
-                header = data.label,
-                txt = 'Cost: $' .. data.cost,
-                params = {
-                    event = 'qb-cityhall:client:requestId',
-                    args = {
-                        type = license,
-                        cost = data.cost
-                    }
-                }
-            })
         end
 
-        exports['qb-menu']:openMenu(identityMenu)
+        lib.registerContext({
+            id = 'identity_menu',
+            title = 'Identity',
+            menu = 'cityhall_menu',
+            options = menuOptions
+        })
+
+        lib.showContext('identity_menu')
     end, closestCityhall)
 end
 
 local function openJobMenu()
-    QBCore.Functions.TriggerCallback('qb-cityhall:server:receiveJobs', function(jobs)
-        local jobMenu = {
-            {
-                header = 'Job Center',
-                isMenuHeader = true
-            },
-            {
-                header = '← Go Back',
-                params = {
-                    event = 'qb-cityhall:client:openCityhallMenu'
+    lib.callback('qb-cityhall:server:receiveJobs', false, function(jobs)
+        local menuOptions = {}
+        for jobName, jobData in pairs(jobs) do
+            menuOptions[#menuOptions + 1] = {
+                title = jobData.label,
+                description = 'Apply for this job',
+                event = 'qb-cityhall:client:applyJob',
+                args = {
+                    job = jobName
                 }
             }
-        }
-
-        for jobName, jobData in pairs(jobs) do
-            table.insert(jobMenu, {
-                header = jobData.label,
-                txt = 'Apply for this job',
-                params = {
-                    event = 'qb-cityhall:client:applyJob',
-                    args = {
-                        job = jobName
-                    }
-                }
-            })
         end
 
-        exports['qb-menu']:openMenu(jobMenu)
+        lib.registerContext({
+            id = 'job_menu',
+            title = 'Job Center',
+            menu = 'cityhall_menu',
+            options = menuOptions
+        })
+
+        lib.showContext('job_menu')
     end)
 end
 
@@ -202,11 +187,12 @@ local function spawnPeds()
         while not HasModelLoaded(current.model) do
             Wait(0)
         end
-        local ped = CreatePed(0, current.model, current.coords.x, current.coords.y, current.coords.z, current.coords.w, false, false)
+        local ped = CreatePed(0, current.model, current.coords.x, current.coords.y, current.coords.z, current.coords.w,
+            false, false)
         FreezeEntityPosition(ped, true)
         SetEntityInvincible(ped, true)
         SetBlockingOfNonTemporaryEvents(ped, true)
-        TaskStartScenarioInPlace(ped, current.scenario, true, true)
+        TaskStartScenarioInPlace(ped, current.scenario, 1, true)
         current.pedHandle = ped
         if Config.UseTarget then
             local opts = nil
@@ -215,12 +201,13 @@ local function spawnPeds()
                     label = 'Take Driving Lessons',
                     icon = 'fa-solid fa-car-side',
                     action = function()
-                        TriggerServerEvent('qb-cityhall:server:sendDriverTest', Config.DrivingSchools[closestDrivingSchool].instructors)
+                        TriggerServerEvent('qb-cityhall:server:sendDriverTest',
+                            Config.DrivingSchools[closestDrivingSchool].instructors)
                     end
                 }
             elseif current.cityhall then
                 opts = {
-                    label = 'Open Cityhall',
+                    label = 'Open City Hall',
                     icon = 'fa-solid fa-city',
                     action = function()
                         inRangeCityhall = true
@@ -252,7 +239,7 @@ local function spawnPeds()
                                 exports['qb-core']:DrawText('[E] Take Driving Lessons')
                             elseif current.cityhall then
                                 inRangeCityhall = true
-                                exports['qb-core']:DrawText('[E] Open Cityhall')
+                                exports['qb-core']:DrawText('[E] Open City Hall')
                             end
                         else
                             exports['qb-core']:HideText()
@@ -320,7 +307,8 @@ RegisterNetEvent('qb-cityhall:client:requestId', function(data)
         local license = Config.Cityhalls[closestCityhall].licenses[data.type]
         if license and data.cost == license.cost then
             TriggerServerEvent('qb-cityhall:server:requestId', data.type, closestCityhall)
-            QBCore.Functions.Notify(('You have received your %s for $%s'):format(license.label, data.cost), 'success', 3500)
+            QBCore.Functions.Notify(('You have received your %s for $%s'):format(license.label, data.cost), 'success',
+                3500)
         else
             QBCore.Functions.Notify(Lang:t('error.not_in_range'), 'error')
         end
@@ -346,7 +334,8 @@ RegisterNetEvent('qb-cityhall:client:sendDriverEmail', function(charinfo)
         TriggerServerEvent('qb-phone:server:sendNewMail', {
             sender = Lang:t('email.sender'),
             subject = Lang:t('email.subject'),
-            message = Lang:t('email.message', { gender = gender, lastname = charinfo.lastname, firstname = charinfo.firstname, phone = charinfo.phone }),
+            message = Lang:t('email.message',
+                { gender = gender, lastname = charinfo.lastname, firstname = charinfo.firstname, phone = charinfo.phone }),
             button = {}
         })
     end)
@@ -391,7 +380,8 @@ CreateThread(function()
                 elseif inRangeDrivingSchool then
                     sleep = 0
                     if IsControlJustPressed(0, 38) then
-                        TriggerServerEvent('qb-cityhall:server:sendDriverTest', Config.DrivingSchools[closestDrivingSchool].instructors)
+                        TriggerServerEvent('qb-cityhall:server:sendDriverTest',
+                            Config.DrivingSchools[closestDrivingSchool].instructors)
                         sleep = 5000
                         exports['qb-core']:KeyPressed()
                         Wait(500)
