@@ -1,3 +1,5 @@
+if not lib.checkDependency('ox_lib', '3.30.0', true) then return end
+
 local QBCore = exports['qb-core']:GetCoreObject()
 local PlayerData = QBCore.Functions.GetPlayerData()
 local isLoggedIn = LocalPlayer.state.isLoggedIn
