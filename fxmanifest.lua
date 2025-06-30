@@ -4,7 +4,7 @@ lua54 'yes'
 use_fxv2_oal 'yes'
 author 'Kakarot'
 description 'Allows players to purchase id cards and licenses or change their job'
-version '2.2.0'
+version '2.2.1'
 
 shared_scripts {
     '@qb-core/shared/locale.lua',
