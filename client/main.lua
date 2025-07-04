@@ -238,13 +238,31 @@ local function spawnPeds()
                         if inside then
                             if current.drivingschool then
                                 inRangeDrivingSchool = true
-                                exports['qb-core']:DrawText('[E] Take Driving Lessons')
+                                if Config.DrawText == 'qb' then
+                                    exports['qb-core']:DrawText('[E] - Take Driving Lessons')
+                                elseif Config.DrawText == 'ox' then
+                                    lib.showTextUI('[E] - Take Driving Lessons')
+                                elseif Config.DrawText == 'jg' then
+                                    exports['jg-textui']:DrawText('[E] - Take Driving Lessons')
+                                end
                             elseif current.cityhall then
                                 inRangeCityhall = true
-                                exports['qb-core']:DrawText('[E] Open City Hall')
+                                if Config.DrawText == 'qb' then
+                                    exports['qb-core']:DrawText('[E] - Open City Hall')
+                                elseif Config.DrawText == 'ox' then
+                                    lib.showTextUI('[E] - Open City Hall')
+                                elseif Config.DrawText == 'jg' then
+                                    exports['jg-textui']:DrawText('[E] - Open City Hall')
+                                end
                             end
                         else
-                            exports['qb-core']:HideText()
+                            if Config.DrawText == 'qb' then
+                                exports['qb-core']:HideText()
+                            elseif Config.DrawText == 'ox' then
+                                lib.hideTextUI()
+                            elseif Config.DrawText == 'jg' then
+                                exports['jg-textui']:HideText()
+                            end
                             if current.drivingschool then
                                 inRangeDrivingSchool = false
                             elseif current.cityhall then
@@ -412,7 +430,13 @@ CreateThread(function()
                         openCityhallMenu()
                         exports['qb-core']:KeyPressed()
                         Wait(500)
-                        exports['qb-core']:HideText()
+                        if Config.DrawText == 'qb' then
+                            exports['qb-core']:HideText()
+                        elseif Config.DrawText == 'ox' then
+                            lib.hideTextUI()
+                        elseif Config.DrawText == 'jg' then
+                            exports['jg-textui']:HideText()
+                        end
                         sleep = 1000
                     end
                 elseif inRangeDrivingSchool then
@@ -423,7 +447,13 @@ CreateThread(function()
                         sleep = 5000
                         exports['qb-core']:KeyPressed()
                         Wait(500)
-                        exports['qb-core']:HideText()
+                        if Config.DrawText == 'qb' then
+                            exports['qb-core']:HideText()
+                        elseif Config.DrawText == 'ox' then
+                            lib.hideTextUI()
+                        elseif Config.DrawText == 'jg' then
+                            exports['jg-textui']:HideText()
+                        end
                     end
                 end
             end
