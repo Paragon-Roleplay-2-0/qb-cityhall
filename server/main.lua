@@ -82,7 +82,7 @@ RegisterNetEvent('qb-cityhall:server:requestId', function(item, hall)
     local Player = QBCore.Functions.GetPlayer(src)
     if not Player then return end
     local itemInfo = Config.Cityhalls[hall].licenses[item]
-    if not Player.Functions.RemoveMoney('cash', itemInfo.cost, 'cityhall id') then return TriggerClientEvent('QBCore:Notify', src, ('You don\'t have enough money on you, you need %s cash'):format(itemInfo.cost), 'error') end
+    if not Player.Functions.RemoveMoney('cash', itemInfo.cost, 'cityhall id') then return TriggerClientEvent('ox_lib:notify', src, { description = ('You don\'t have enough money on you, you need %s cash'):format(itemInfo.cost), position = 'center-right', type = 'error'}) end
     local info = {}
     if item == 'id_card' then
         info.citizenid = Player.PlayerData.citizenid
@@ -136,7 +136,17 @@ RegisterNetEvent('qb-cityhall:server:sendDriverTest', function(instructors)
             exports['qb-phone']:sendNewMailToOffline(citizenid, mailData)
         end
     end
-    TriggerClientEvent('QBCore:Notify', src, 'An email has been sent to driving schools, and you will be contacted automatically', 'success', 5000)
+    if Config.Notify == 'qb' then
+        TriggerClientEvent('QBCore:Notify', src, 'An email has been sent to driving schools, and you will be contacted automatically', 'success', 5000)
+    elseif Config.Notify == 'ox' then
+        TriggerClientEvent('ox_lib:notify', src, {
+            title = 'Email Sent',
+            description = 'An email has been sent to driving schools, and you will be contacted automatically!',
+            duration = 5000,
+            position = 'center-right',
+            type = 'success'
+        })
+    end
 end)
 
 RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job, cityhallCoords)
@@ -155,7 +165,17 @@ RegisterNetEvent('qb-cityhall:server:ApplyJob', function(job, cityhallCoords)
     end
     local JobInfo = QBCore.Shared.Jobs[job]
     Player.Functions.SetJob(data.job)
-    TriggerClientEvent('QBCore:Notify', data.src, Lang:t('info.new_job', { job = JobInfo.label }))
+    if Config.Notify == 'qb' then
+        TriggerClientEvent('QBCore:Notify', data.src, Lang:t('info.new_job', { job = JobInfo.label }))
+    elseif Config.Notify == 'ox' then
+        TriggerClientEvent('ox_lib:notify', data.src, {
+            title = 'New Job',
+            description = Lang:t('info.new_job', { job = JobInfo.label }),
+            duration = 5000,
+            position = 'center-right',
+            type = 'success'
+        })
+    end
 end)
 
 RegisterNetEvent('qb-cityhall:server:getIDs', giveStarterItems)
@@ -176,16 +196,53 @@ QBCore.Commands.Add('drivinglicense', 'Give a drivers license to someone', { { '
                     if Config.DrivingSchools[i].instructors[id] == Player.PlayerData.citizenid then
                         SearchedPlayer.PlayerData.metadata['licences']['driver'] = true
                         SearchedPlayer.Functions.SetMetaData('licences', SearchedPlayer.PlayerData.metadata['licences'])
-                        TriggerClientEvent('QBCore:Notify', SearchedPlayer.PlayerData.source, 'You have passed! Pick up your drivers license at the town hall', 'success', 5000)
-                        TriggerClientEvent('QBCore:Notify', source, ('Player with ID %s has been granted access to a driving license'):format(SearchedPlayer.PlayerData.source), 'success', 5000)
+                            if Config.Notify == 'qb' then
+                                TriggerClientEvent('QBCore:Notify', SearchedPlayer.PlayerData.source, 'You have passed! Pick up your drivers license at the town hall', 'success', 5000)
+                                TriggerClientEvent('QBCore:Notify', source, ('Player with ID %s has been granted access to a driving license'):format(SearchedPlayer.PlayerData.source), 'success', 5000)
+                            elseif Config.Notify == 'ox' then
+                                TriggerClientEvent('ox_lib:notify', SearchedPlayer.PlayerData.source, {
+                                    title = 'Test Passed',
+                                    description = 'You have passed! Pick up your drivers license at the town hall',
+                                    duration = 5000,
+                                    position = 'center-right',
+                                    type = 'success'
+                                })
+                                TriggerClientEvent('ox_lib:notify', source, {
+                                    title = 'Driving License Granted',
+                                    description = ('Player with ID %s has been granted access to a driving license'):format(SearchedPlayer.PlayerData.source),
+                                    duration = 5000,
+                                    position = 'center-right',
+                                    type = 'success'
+                                })
+                            end
                         break
                     end
                 end
             end
         else
-            TriggerClientEvent('QBCore:Notify', source, "Can't give permission for a drivers license, this person already has permission", 'error')
+                if Config.Notify == 'qb' then
+                    TriggerClientEvent('QBCore:Notify', source,
+                        "Can't give permission for a drivers license, this person already has permission", 'error')
+                elseif Config.Notify == 'ox' then
+                    TriggerClientEvent('ox_lib:notify', source, {
+                        title = 'Permission Error',
+                        description = "Can't give permission for a drivers license, this person already has permission",
+                        duration = 5000,
+                        position = 'center-right',
+                        type = 'error'
+                    })
+                end
         end
     else
-        TriggerClientEvent('QBCore:Notify', source, 'Player Not Online', 'error')
+            if Config.Notify == 'qb' then
+                TriggerClientEvent('QBCore:Notify', source, 'Player Not Online', 'error')
+            elseif Config.Notify == 'ox' then
+                TriggerClientEvent('ox_lib:notify', source, {
+                    title = 'Player Not Online',
+                    duration = 5000,
+                    position = 'center-right',
+                    type = 'error'
+                })
+            end
     end
 end)
