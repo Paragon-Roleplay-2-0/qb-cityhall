@@ -309,13 +309,40 @@ RegisterNetEvent('qb-cityhall:client:requestId', function(data)
         local license = Config.Cityhalls[closestCityhall].licenses[data.type]
         if license and data.cost == license.cost then
             TriggerServerEvent('qb-cityhall:server:requestId', data.type, closestCityhall)
-            QBCore.Functions.Notify(('You have received your %s for $%s'):format(license.label, data.cost), 'success',
-                3500)
+            if Config.Notify == 'qb' then
+                QBCore.Functions.Notify(('You have received your %s for $%s'):format(license.label, data.cost), 'success', 3500)
+            elseif Config.Notify == 'ox' then
+                lib.notify({
+                    title = ('%s Received'):format(license.label),
+                    description = ('You have received your %s for $%s'):format(license.label, data.cost),
+                    duration = 3500,
+                    position = 'center-right',
+                    type = 'success'
+                })
+            end
         else
-            QBCore.Functions.Notify(Lang:t('error.not_in_range'), 'error')
+            if Config.Notify == 'qb' then
+                QBCore.Functions.Notify(Lang:t('error.not_in_range'), 'error')
+            elseif Config.Notify == 'ox' then
+                lib.notify({
+                    description = Lang:t('error.not_in_range'),
+                    duration = 3500,
+                    position = 'center-right',
+                    type = 'error'
+                })
+            end
         end
     else
-        QBCore.Functions.Notify(Lang:t('error.not_in_range'), 'error')
+        if Config.Notify == 'qb' then
+            QBCore.Functions.Notify(Lang:t('error.not_in_range'), 'error')
+        elseif Config.Notify == 'ox' then
+            lib.notify({
+                description = Lang:t('error.not_in_range'),
+                duration = 3500,
+                position = 'center-right',
+                type = 'error'
+            })
+        end
     end
 end)
 
@@ -323,7 +350,16 @@ RegisterNetEvent('qb-cityhall:client:applyJob', function(data)
     if inRangeCityhall then
         TriggerServerEvent('qb-cityhall:server:ApplyJob', data.job, Config.Cityhalls[closestCityhall].coords)
     else
-        QBCore.Functions.Notify(Lang:t('error.not_in_range'), 'error')
+        if Config.Notify == 'qb' then
+            QBCore.Functions.Notify(Lang:t('error.not_in_range'), 'error')
+        elseif Config.Notify == 'ox' then
+            lib.notify({
+                description = Lang:t('error.not_in_range'),
+                duration = 3500,
+                position = 'center-right',
+                type = 'error'
+            })
+        end
     end
 end)
 
