@@ -43,8 +43,7 @@ local function getClosestSchool()
 end
 
 local function createBlip(options)
-    if not options.coords or type(options.coords) ~= 'table' and type(options.coords) ~= 'vector3' then return error(('createBlip() expected coords in a vector3 or table but received %s')
-        :format(options.coords)) end
+    if not options.coords or type(options.coords) ~= 'table' and type(options.coords) ~= 'vector3' then return error(('createBlip() expected coords in a vector3 or table but received %s'):format(options.coords)) end
     local blip = AddBlipForCoord(options.coords.x, options.coords.y, options.coords.z)
     SetBlipSprite(blip, options.sprite or 1)
     SetBlipDisplay(blip, options.display or 4)
@@ -104,6 +103,7 @@ local function openCityhallMenu()
         id = 'cityhall_menu',
         title = 'City Hall',
         canClose = true,
+        position = 'offcenter-right', -- Lation Modern UI
         options = {
             {
                 title = 'ID Card',
@@ -189,8 +189,7 @@ local function spawnPeds()
         while not HasModelLoaded(current.model) do
             Wait(0)
         end
-        local ped = CreatePed(0, current.model, current.coords.x, current.coords.y, current.coords.z, current.coords.w,
-            false, false)
+        local ped = CreatePed(0, current.model, current.coords.x, current.coords.y, current.coords.z, current.coords.w, false, false)
         FreezeEntityPosition(ped, true)
         SetEntityInvincible(ped, true)
         SetBlockingOfNonTemporaryEvents(ped, true)
@@ -203,8 +202,7 @@ local function spawnPeds()
                     label = 'Take Driving Lessons',
                     icon = 'fa-solid fa-car-side',
                     action = function()
-                        TriggerServerEvent('qb-cityhall:server:sendDriverTest',
-                            Config.DrivingSchools[closestDrivingSchool].instructors)
+                        TriggerServerEvent('qb-cityhall:server:sendDriverTest', Config.DrivingSchools[closestDrivingSchool].instructors)
                     end
                 }
             elseif current.cityhall then
@@ -220,7 +218,7 @@ local function spawnPeds()
             if opts then
                 exports['qb-target']:AddTargetEntity(ped, {
                     options = { opts },
-                    distance = 2.0
+                    distance = 3.0
                 })
             end
         else
@@ -390,8 +388,7 @@ RegisterNetEvent('qb-cityhall:client:sendDriverEmail', function(charinfo)
         TriggerServerEvent('qb-phone:server:sendNewMail', {
             sender = Lang:t('email.sender'),
             subject = Lang:t('email.subject'),
-            message = Lang:t('email.message',
-                { gender = gender, lastname = charinfo.lastname, firstname = charinfo.firstname, phone = charinfo.phone }),
+            message = Lang:t('email.message', { gender = gender, lastname = charinfo.lastname, firstname = charinfo.firstname, phone = charinfo.phone }),
             button = {}
         })
     end)

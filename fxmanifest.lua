@@ -12,7 +12,7 @@ shared_scripts {
     'locales/*.lua',
     'config.lua',
     '@ox_lib/init.lua',
-    -- '@lation_ui/init.lua'
+    '@lation_ui/init.lua'
 }
 
 server_script 'server/main.lua'
