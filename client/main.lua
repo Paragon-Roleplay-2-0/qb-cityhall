@@ -239,18 +239,18 @@ local function spawnPeds()
                                 if Config.DrawText == 'qb' then
                                     exports['qb-core']:DrawText('[E] - Take Driving Lessons')
                                 elseif Config.DrawText == 'ox' then
-                                    lib.showTextUI('[E] - Take Driving Lessons')
+                                    lib.showTextUI('[E] Take Driving Lessons', { position = 'left-center' })
                                 elseif Config.DrawText == 'jg' then
-                                    exports['jg-textui']:DrawText('[E] - Take Driving Lessons')
+                                    exports['jg-textui']:DrawText('[E] Take Driving Lessons')
                                 end
                             elseif current.cityhall then
                                 inRangeCityhall = true
                                 if Config.DrawText == 'qb' then
                                     exports['qb-core']:DrawText('[E] - Open City Hall')
                                 elseif Config.DrawText == 'ox' then
-                                    lib.showTextUI('[E] - Open City Hall')
+                                    lib.showTextUI('[E] Open City Hall', { position = 'left-center' })
                                 elseif Config.DrawText == 'jg' then
-                                    exports['jg-textui']:DrawText('[E] - Open City Hall')
+                                    exports['jg-textui']:DrawText('[E] Open City Hall')
                                 end
                             end
                         else
